@@ -10,33 +10,180 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as StudioRouteImport } from './routes/studio'
+import { Route as TeacherRouteImport } from './routes/teacher'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as CoursesIndexRouteImport } from './routes/courses.index'
+import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
+import { Route as WatchVideoIdRouteImport } from './routes/watch.$videoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudioRoute = StudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeacherRoute = TeacherRouteImport.update({
+  id: '/teacher',
+  path: '/teacher',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoursesIndexRoute = CoursesIndexRouteImport.update({
+  id: '/courses/',
+  path: '/courses/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
+  id: '/courses/$courseId',
+  path: '/courses/$courseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WatchVideoIdRoute = WatchVideoIdRouteImport.update({
+  id: '/watch/$videoId',
+  path: '/watch/$videoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/studio': typeof StudioRoute
+  '/teacher': typeof TeacherRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/watch/$videoId': typeof WatchVideoIdRoute
+  '/courses/': typeof CoursesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/studio': typeof StudioRoute
+  '/teacher': typeof TeacherRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/watch/$videoId': typeof WatchVideoIdRoute
+  '/courses': typeof CoursesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/studio': typeof StudioRoute
+  '/teacher': typeof TeacherRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/watch/$videoId': typeof WatchVideoIdRoute
+  '/courses/': typeof CoursesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/auth'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/studio'
+    | '/teacher'
+    | '/admin/users'
+    | '/courses/$courseId'
+    | '/watch/$videoId'
+    | '/courses/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/account'
+    | '/auth'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/studio'
+    | '/teacher'
+    | '/admin/users'
+    | '/courses/$courseId'
+    | '/watch/$videoId'
+    | '/courses'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/auth'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/studio'
+    | '/teacher'
+    | '/admin/users'
+    | '/courses/$courseId'
+    | '/watch/$videoId'
+    | '/courses/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  AuthRoute: typeof AuthRoute
+  DashboardRoute: typeof DashboardRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  StudioRoute: typeof StudioRoute
+  TeacherRoute: typeof TeacherRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  CoursesCourseIdRoute: typeof CoursesCourseIdRoute
+  WatchVideoIdRoute: typeof WatchVideoIdRoute
+  CoursesIndexRoute: typeof CoursesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +195,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/studio': {
+      id: '/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teacher': {
+      id: '/teacher'
+      path: '/teacher'
+      fullPath: '/teacher'
+      preLoaderRoute: typeof TeacherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/courses/': {
+      id: '/courses/'
+      path: '/courses'
+      fullPath: '/courses/'
+      preLoaderRoute: typeof CoursesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/courses/$courseId': {
+      id: '/courses/$courseId'
+      path: '/courses/$courseId'
+      fullPath: '/courses/$courseId'
+      preLoaderRoute: typeof CoursesCourseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/watch/$videoId': {
+      id: '/watch/$videoId'
+      path: '/watch/$videoId'
+      fullPath: '/watch/$videoId'
+      preLoaderRoute: typeof WatchVideoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  AuthRoute: AuthRoute,
+  DashboardRoute: DashboardRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  StudioRoute: StudioRoute,
+  TeacherRoute: TeacherRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  CoursesCourseIdRoute: CoursesCourseIdRoute,
+  WatchVideoIdRoute: WatchVideoIdRoute,
+  CoursesIndexRoute: CoursesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

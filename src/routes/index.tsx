@@ -1,126 +1,93 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Globe2, Landmark, PlayCircle, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CourseCard } from "@/components/course-card";
+import { EmptyState } from "@/components/site-shell";
+import { useCourses, useTeacherPhoto, useTeacherProfile } from "@/lib/data";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Wake — Simple Alarm Clock" },
-      { name: "description", content: "Set alarms in your browser with a clean, simple alarm clock." },
-      { property: "og:title", content: "Wake — Simple Alarm Clock" },
-      { property: "og:description", content: "Set alarms in your browser with a clean, simple alarm clock." },
+      { title: "أسد التاريخ | منصة أ. أحمد أبو العلا للدراسات الاجتماعية" },
+      { name: "description", content: "تعلّم التاريخ والجغرافيا مع أسد التاريخ أ. أحمد أبو العلا عبر شروحات فيديو منظمة." },
+      { property: "og:title", content: "أسد التاريخ | أ. أحمد أبو العلا" },
+      { property: "og:description", content: "شروحات فيديو منظمة في التاريخ والجغرافيا." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Index,
+  component: Home,
 });
 
-type Alarm = { id: number; time: string; label: string; on: boolean };
-
-function Index() {
-  const [now, setNow] = useState<Date | null>(null);
-  const [alarms, setAlarms] = useState<Alarm[]>([]);
-  const [time, setTime] = useState("07:00");
-  const [label, setLabel] = useState("");
-  const [ringing, setRinging] = useState<Alarm | null>(null);
-  const audio = useRef<{ ctx: AudioContext; osc: OscillatorNode; int: number } | null>(null);
-  const lastFired = useRef("");
-
-  useEffect(() => {
-    const s = localStorage.getItem("alarms");
-    if (s) setAlarms(JSON.parse(s));
-    setNow(new Date());
-    const t = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  useEffect(() => localStorage.setItem("alarms", JSON.stringify(alarms)), [alarms]);
-
-  useEffect(() => {
-    if (!now || ringing) return;
-    const hm = now.toTimeString().slice(0, 5);
-    if (lastFired.current === hm) return;
-    const a = alarms.find((x) => x.on && x.time === hm);
-    if (a) {
-      lastFired.current = hm;
-      setRinging(a);
-      startSound();
-    }
-  }, [now]);
-
-  function startSound() {
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "square";
-    osc.frequency.value = 880;
-    osc.connect(gain).connect(ctx.destination);
-    gain.gain.value = 0;
-    osc.start();
-    let on = false;
-    const int = window.setInterval(() => {
-      on = !on;
-      gain.gain.value = on ? 0.15 : 0;
-    }, 300);
-    audio.current = { ctx, osc, int };
-  }
-
-  function stop() {
-    if (audio.current) {
-      clearInterval(audio.current.int);
-      audio.current.osc.stop();
-      audio.current.ctx.close();
-      audio.current = null;
-    }
-    setRinging(null);
-  }
-
-  function add(e: React.FormEvent) {
-    e.preventDefault();
-    setAlarms((a) => [...a, { id: Date.now(), time, label: label || "Alarm", on: true }].sort((x, y) => x.time.localeCompare(y.time)));
-    setLabel("");
-  }
+function Home() {
+  const { session } = useAuth();
+  const teacher = useTeacherProfile();
+  const photo = useTeacherPhoto().url;
+  const courses = useCourses(1);
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col items-center px-4 py-16">
-      <h1 className="text-sm uppercase tracking-[0.3em] text-muted-foreground">Wake</h1>
-      <div className="mt-6 font-mono text-7xl sm:text-8xl font-bold tabular-nums">
-        {now ? now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "--:--:--"}
-      </div>
-      <p className="mt-2 text-muted-foreground">{now?.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })}</p>
-
-      <form onSubmit={add} className="mt-12 flex w-full max-w-md gap-2">
-        <input type="time" required value={time} onChange={(e) => setTime(e.target.value)} className="rounded-md border border-input bg-card px-3 py-2" />
-        <input placeholder="Label" value={label} onChange={(e) => setLabel(e.target.value)} className="flex-1 rounded-md border border-input bg-card px-3 py-2" />
-        <button className="rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground hover:bg-primary/90">Add</button>
-      </form>
-
-      <ul className="mt-8 w-full max-w-md space-y-2">
-        {alarms.length === 0 && <li className="text-center text-muted-foreground">No alarms yet.</li>}
-        {alarms.map((a) => (
-          <li key={a.id} className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
-            <div className={a.on ? "" : "opacity-40"}>
-              <div className="font-mono text-2xl">{a.time}</div>
-              <div className="text-sm text-muted-foreground">{a.label}</div>
+    <>
+      <section className="bg-[image:var(--gradient-hero)] text-navy-foreground">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
+          <div>
+            <p className="mb-3 inline-block rounded-full bg-gold/20 px-3 py-1 text-sm text-gold">الدراسات الاجتماعية — تاريخ وجغرافيا</p>
+            <h1 className="font-display text-4xl leading-tight md:text-5xl">
+              ذاكر التاريخ مع <span className="text-gold">أسد التاريخ</span>
+            </h1>
+            <p className="mt-4 max-w-lg text-lg text-navy-foreground/80">
+              شروحات فيديو واضحة ومنظمة مع أ. {teacher.data?.display_name ?? "أحمد أبو العلا"}، تساعدك تفهم وتحفظ وتتفوق.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg" className="bg-gold text-gold-foreground hover:bg-gold/90">
+                {session ? <Link to="/dashboard">ادخل لوحتك</Link> : <Link to="/auth" search={{ mode: "signup" }}>ابدأ الآن مجانًا</Link>}
+              </Button>
+              <Button asChild size="lg" variant="outline" className="border-navy-foreground/40 bg-transparent text-navy-foreground hover:bg-navy-foreground/10">
+                <Link to="/courses">تصفح المقررات</Link>
+              </Button>
             </div>
-            <div className="flex items-center gap-3">
-              <button onClick={() => setAlarms((l) => l.map((x) => (x.id === a.id ? { ...x, on: !x.on } : x)))} className="rounded-md border border-input px-3 py-1 text-sm">
-                {a.on ? "On" : "Off"}
-              </button>
-              <button onClick={() => setAlarms((l) => l.filter((x) => x.id !== a.id))} className="text-sm text-destructive">Delete</button>
+          </div>
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="absolute -inset-3 rounded-full bg-[image:var(--gradient-gold)] opacity-70 blur-xl" />
+              {photo ? (
+                <img src={photo} alt="أ. أحمد أبو العلا" className="relative h-64 w-64 rounded-full border-4 border-gold object-cover md:h-80 md:w-80" />
+              ) : (
+                <div className="relative h-64 w-64 rounded-full border-4 border-gold bg-navy md:h-80 md:w-80" aria-hidden />
+              )}
             </div>
-          </li>
-        ))}
-      </ul>
-      <p className="mt-8 text-xs text-muted-foreground">Keep this tab open for alarms to ring.</p>
-
-      {ringing && (
-        <div className="fixed inset-0 flex flex-col items-center justify-center bg-primary text-primary-foreground animate-pulse">
-          <div className="font-mono text-8xl font-bold">{ringing.time}</div>
-          <div className="mt-2 text-2xl">{ringing.label}</div>
-          <button onClick={stop} className="mt-10 rounded-full bg-background px-10 py-4 text-lg font-semibold text-foreground">Stop</button>
+          </div>
         </div>
-      )}
-    </main>
+      </section>
+
+      <section className="mx-auto grid max-w-6xl gap-4 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { i: Landmark, t: "التاريخ", d: "أحداث وشخصيات مرتبة زمنيًا" },
+          { i: Globe2, t: "الجغرافيا", d: "خرائط ومفاهيم مبسطة" },
+          { i: PlayCircle, t: "فيديوهات منظمة", d: "مقسمة حسب المقرر" },
+          { i: ShieldCheck, t: "حساب آمن", d: "محتوى متاح للطلاب المسجلين" },
+        ].map(({ i: Icon, t, d }) => (
+          <div key={t} className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+            <Icon className="h-8 w-8 text-teal" />
+            <h2 className="mt-3 font-display text-lg text-navy">{t}</h2>
+            <p className="text-sm text-muted-foreground">{d}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4">
+        <h2 className="mb-6 font-display text-2xl text-navy">أحدث المقررات</h2>
+        {courses.isLoading ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[1, 2, 3].map((k) => <Skeleton key={k} className="aspect-video rounded-xl" />)}</div>
+        ) : courses.data?.rows.length ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {courses.data.rows.slice(0, 6).map((c) => <CourseCard key={c.id} course={c} />)}
+          </div>
+        ) : (
+          <EmptyState text="لا توجد مقررات منشورة بعد." />
+        )}
+      </section>
+    </>
   );
 }
