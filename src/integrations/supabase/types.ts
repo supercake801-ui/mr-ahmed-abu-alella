@@ -14,16 +14,294 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      courses: {
+        Row: {
+          cover_path: string | null
+          cover_url: string | null
+          created_at: string
+          description: string
+          id: string
+          is_published: boolean
+          owner_id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_path?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          is_published?: boolean
+          owner_id: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_path?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          is_published?: boolean
+          owner_id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pending_role_grants: {
+        Row: {
+          created_at: string
+          email: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_path: string | null
+          created_at: string
+          full_name: string
+          grade: string | null
+          id: string
+          is_active: boolean
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_path?: string | null
+          created_at?: string
+          full_name?: string
+          grade?: string | null
+          id: string
+          is_active?: boolean
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_path?: string | null
+          created_at?: string
+          full_name?: string
+          grade?: string | null
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      teacher_profile: {
+        Row: {
+          bio: string
+          display_name: string
+          id: number
+          photo_url: string | null
+          tagline: string
+          updated_at: string
+        }
+        Insert: {
+          bio?: string
+          display_name?: string
+          id?: number
+          photo_url?: string | null
+          tagline?: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string
+          display_name?: string
+          id?: number
+          photo_url?: string | null
+          tagline?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      teacher_reviews: {
+        Row: {
+          comment: string
+          created_at: string
+          id: string
+          rating: number
+          reviewer_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string
+          created_at?: string
+          id?: string
+          rating: number
+          reviewer_name?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          reviewer_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      video_secrets: {
+        Row: {
+          password_hash: string
+          password_plain: string | null
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          password_hash: string
+          password_plain?: string | null
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          password_hash?: string
+          password_plain?: string | null
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_secrets_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: true
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      videos: {
+        Row: {
+          course_id: string
+          created_at: string
+          description: string
+          duration_seconds: number | null
+          has_password: boolean
+          id: string
+          mime_type: string | null
+          owner_id: string
+          published_at: string | null
+          size_bytes: number | null
+          status: Database["public"]["Enums"]["video_status"]
+          thumbnail_path: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_path: string | null
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          description?: string
+          duration_seconds?: number | null
+          has_password?: boolean
+          id?: string
+          mime_type?: string | null
+          owner_id: string
+          published_at?: string | null
+          size_bytes?: number | null
+          status?: Database["public"]["Enums"]["video_status"]
+          thumbnail_path?: string | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_path?: string | null
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          description?: string
+          duration_seconds?: number | null
+          has_password?: boolean
+          id?: string
+          mime_type?: string | null
+          owner_id?: string
+          published_at?: string | null
+          size_bytes?: number | null
+          status?: Database["public"]["Enums"]["video_status"]
+          thumbnail_path?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_path?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "videos_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_video_password: {
+        Args: { _password: string; _video_id: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_active_user: { Args: { _user_id: string }; Returns: boolean }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
+      set_video_password: {
+        Args: { _password: string; _video_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "teacher" | "student"
+      video_status: "uploading" | "draft" | "published" | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +428,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "teacher", "student"],
+      video_status: ["uploading", "draft", "published", "failed"],
+    },
   },
 } as const
