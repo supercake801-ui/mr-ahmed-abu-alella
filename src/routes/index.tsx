@@ -6,6 +6,7 @@ import { CourseCard } from "@/components/course-card";
 import { EmptyState } from "@/components/site-shell";
 import { useCourses, useTeacherPhoto, useTeacherProfile } from "@/lib/data";
 import { useAuth } from "@/lib/auth";
+import { TeacherReviews } from "@/components/teacher-reviews";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -41,10 +42,10 @@ function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="bg-gold text-gold-foreground hover:bg-gold/90">
-                {session ? <Link to="/dashboard">ادخل لوحتك</Link> : <Link to="/auth" search={{ mode: "signup" }}>ابدأ الآن مجانًا</Link>}
+                {session ? <Link to="/dashboard">اُدْخُلْ لَوْحَتَك</Link> : <Link to="/auth" search={{ mode: "signup" }}>اِبْدَأِ الآنَ مَجَّانًا</Link>}
               </Button>
               <Button asChild size="lg" variant="outline" className="border-navy-foreground/40 bg-transparent text-navy-foreground hover:bg-navy-foreground/10">
-                <Link to="/courses">تصفح المقررات</Link>
+                <a href="#courses">تَصَفَّحِ المُقَرَّرَات</a>
               </Button>
             </div>
           </div>
@@ -76,7 +77,7 @@ function Home() {
         ))}
       </section>
 
-      <section className="mx-auto max-w-6xl px-4">
+      <section id="courses" className="mx-auto max-w-6xl scroll-mt-24 px-4">
         <h2 className="mb-6 font-display text-2xl text-navy">أحدث المقررات</h2>
         {courses.isLoading ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[1, 2, 3].map((k) => <Skeleton key={k} className="aspect-video rounded-xl" />)}</div>
@@ -88,6 +89,7 @@ function Home() {
           <EmptyState text="لا توجد مقررات منشورة بعد." />
         )}
       </section>
+      <div className="mx-auto max-w-6xl px-4 py-12"><TeacherReviews limit={6} /></div>
     </>
   );
 }
