@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getMediaUrl, getOwnMediaUrl } from "@/lib/platform.functions";
-import teacherPhoto from "@/assets/ahmed-abulela.jpg.asset.json";
+import teacherPhoto from "@/assets/teacher-placeholder.jpg";
 
 export const PAGE_SIZE = 12;
 
-export const DEFAULT_TEACHER_PHOTO = teacherPhoto.url;
+export const DEFAULT_TEACHER_PHOTO = teacherPhoto;
 
 /** Resolve an image stored either as full URL or as a path in the "media" bucket. */
 export function useMediaUrl(pathOrUrl: string | null | undefined) {
