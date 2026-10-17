@@ -38,7 +38,6 @@ export function SiteHeader() {
     <>
       <Link to="/" className={linkCls} activeProps={activeCls} activeOptions={{ exact: true }} onClick={() => setOpen(false)}>الرئيسية</Link>
       <Link to="/teacher" className={linkCls} activeProps={activeCls} onClick={() => setOpen(false)}>المدرس</Link>
-      <Link to="/courses" className={linkCls} activeProps={activeCls} onClick={() => setOpen(false)}>المقررات</Link>
       {session && (
         <Link to="/dashboard" className={linkCls} activeProps={activeCls} onClick={() => setOpen(false)}>لوحتي</Link>
       )}
