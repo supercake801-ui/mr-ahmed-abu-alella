@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Award, Globe2, Landmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TeacherReviews } from "@/components/teacher-reviews";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTeacherPhoto, useTeacherProfile } from "@/lib/data";
 
@@ -44,9 +46,15 @@ function TeacherPage() {
               <p className="mx-auto mt-6 max-w-prose whitespace-pre-line leading-8 md:mx-0">{data?.bio || "نبذة المدرس ستُضاف قريبًا."}</p>
             </>
           )}
-          <Button asChild className="mt-8"><Link to="/courses">شاهد المقررات</Link></Button>
+          <div className="mt-6 grid grid-cols-3 gap-3">
+            {[{ i: Landmark, t: "التاريخ" }, { i: Globe2, t: "الجغرافيا" }, { i: Award, t: "شرح مبسّط" }].map(({ i: Icon, t }) => (
+              <div key={t} className="rounded-xl border border-gold/40 bg-gold/10 p-3 text-center"><Icon className="mx-auto h-6 w-6 text-gold" /><p className="mt-1 text-sm font-medium text-navy">{t}</p></div>
+            ))}
+          </div>
+          <Button asChild className="mt-8"><Link to="/" hash="courses">شَاهِدِ المُقَرَّرَات</Link></Button>
         </div>
       </div>
+      <div className="mt-8"><TeacherReviews /></div>
     </div>
   );
 }
