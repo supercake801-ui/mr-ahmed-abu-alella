@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Captions, Check, Gauge, MoreVertical, Settings2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -13,9 +14,9 @@ export function doubleTapTarget(current: number, duration: number, side: "left" 
   return Math.max(0, Math.min(Number.isFinite(duration) ? duration : next, next));
 }
 
-export function VideoPlayer({ src, onError }: { src: string; onError?: (time: number) => void }) {
+export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; initialTime?: number; onError?: (time: number) => void }) {
   const ref = useRef<HTMLVideoElement>(null);
-  const resumeAt = useRef(0);
+  const resumeAt = useRef(initialTime);
   const [speed, setSpeed] = useState(1);
   const [cc, setCc] = useState(false);
   const [hasTracks, setHasTracks] = useState(false);
@@ -67,15 +68,16 @@ export function VideoPlayer({ src, onError }: { src: string; onError?: (time: nu
         </div>
       )}
       <DropdownMenu>
-        <DropdownMenuTrigger aria-label="إعدادات الفيديو" className="absolute right-3 top-3 rounded-full bg-navy/70 p-2 text-navy-foreground hover:bg-navy">
-          <MoreVertical className="h-5 w-5" />
+        <DropdownMenuTrigger asChild>
+          <Button size="icon" variant="ghost" aria-label="إعدادات الفيديو" title="إعدادات الفيديو" className="absolute right-3 top-3 rounded-full bg-navy/70 text-navy-foreground hover:bg-navy">
+            <MoreVertical className="h-5 w-5" />
+          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent dir="rtl" align="end" className="w-56">
           <DropdownMenuLabel className="flex items-center gap-2"><Gauge className="h-4 w-4" />السُّرْعَة</DropdownMenuLabel>
           <div className="grid grid-cols-3 gap-1 px-1 pb-1">
             {SPEEDS.map((s) => (
-              <button key={s} onClick={() => setSpeed(s)} aria-pressed={s === speed}
-                className={`rounded px-2 py-1 text-sm ${s === speed ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}>{s}×</button>
+              <Button key={s} size="sm" variant={s === speed ? "default" : "ghost"} onClick={() => setSpeed(s)} aria-pressed={s === speed}>{s}×</Button>
             ))}
           </div>
           <DropdownMenuSeparator />

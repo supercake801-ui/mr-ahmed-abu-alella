@@ -44,6 +44,7 @@ function Watch() {
   const [pw, setPw] = useState("");
   const [msg, setMsg] = useState("");
   const pwRef = useRef<string | undefined>(undefined);
+  const resumeAt = useRef(0);
 
   async function request(password?: string) {
     setState("loading");
@@ -67,7 +68,8 @@ function Watch() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [meta.data]);
 
-  function onVideoError() {
+  function onVideoError(time: number) {
+    resumeAt.current = time;
     setMsg("انقطع التشغيل أو انتهت صلاحية رابط المشاهدة المؤقت.");
     setState("error");
   }
@@ -82,7 +84,7 @@ function Watch() {
       <h1 className="mt-2 font-display text-2xl text-navy md:text-3xl">{v.title}</h1>
       <div className="mt-4 overflow-hidden rounded-xl bg-navy">
         {state === "ready" && url ? (
-          <VideoPlayer src={url} onError={onVideoError} />
+          <VideoPlayer src={url} initialTime={resumeAt.current} onError={onVideoError} />
         ) : (
           <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 p-6 text-center text-navy-foreground">
             {(state === "loading" || state === "idle") && <p>جارٍ التحقق من صلاحية المشاهدة…</p>}
