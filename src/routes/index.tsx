@@ -32,7 +32,7 @@ function Home() {
   return (
     <>
       <section className="relative overflow-hidden bg-[image:var(--gradient-hero)] text-navy-foreground">
-        <img src={themeArt.url} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top opacity-20" />
+        <img src={themeArt.url} alt="" aria-hidden className="hero-art-fade pointer-events-none absolute inset-0 h-full w-full object-cover object-[center_20%] opacity-35 md:object-left" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
           <div>
             <p className="mb-3 inline-block rounded-full bg-gold/20 px-3 py-1 text-sm text-gold">الدراسات الاجتماعية — تاريخ وجغرافيا</p>

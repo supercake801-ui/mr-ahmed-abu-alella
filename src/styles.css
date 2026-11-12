@@ -165,3 +165,11 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Historical artwork stays on the portrait side and fades out before the text. */
+@utility hero-art-fade {
+  mask-image: linear-gradient(to top, black 35%, transparent 75%);
+  @media (min-width: 768px) {
+    mask-image: linear-gradient(to right, black 30%, transparent 62%);
+  }
+}
