@@ -1,7 +1,7 @@
 # Requested platform development
 
 - [ ] Latest final brief: full-card links/touch states, persistent fullscreen toolbar, real quality sources and WebVTT, searchable student management, interactive courses, announcements and independent themes.
-- [x] Home historical photo sits only behind the portrait side and no longer covers text (checked desktop + phone). Historical home photo loads at desktop/phone widths; existing lesson fullscreen menu and 3× speed verified in Chromium. Native iPhone fullscreen still cannot retain custom controls.
+- [ ] Current repair: historical image in a separate right-hand frame, welcome text left; one shared video toolbar for play, sound, CC, fullscreen and settings; verify desktop/mobile and fullscreen.
 - [ ] Secure primary owner and temporary teacher assignment; protect owner and preserve all existing accounts.
 - [ ] Teacher/owner account management table; role controls and guarded deletion.
 - [ ] Add students with required grade, student/guardian phones, ID and scanner Enter support.
