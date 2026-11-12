@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Captions, Check, Gauge, MoreVertical, Settings2 } from "lucide-react";
+import { Captions, Check, Gauge, Maximize, Minimize, MoreVertical, Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -22,6 +22,33 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
   const [hasTracks, setHasTracks] = useState(false);
   const [flash, setFlash] = useState<null | "left" | "right">(null);
   const lastTap = useRef(0);
+  const box = useRef<HTMLDivElement>(null);
+  const [full, setFull] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  useEffect(() => {
+    const on = () => setFull(document.fullscreenElement === box.current);
+    document.addEventListener("fullscreenchange", on);
+    return () => document.removeEventListener("fullscreenchange", on);
+  }, []);
+  useEffect(() => {
+    if (!expanded) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const exit = (event: KeyboardEvent) => { if (event.key === "Escape") setExpanded(false); };
+    document.addEventListener("keydown", exit);
+    return () => {
+      document.body.style.overflow = previous;
+      document.removeEventListener("keydown", exit);
+    };
+  }, [expanded]);
+  async function toggleFull() {
+    if (expanded) { setExpanded(false); return; }
+    if (document.fullscreenElement) { await document.exitFullscreen(); return; }
+    try {
+      if (box.current?.requestFullscreen) await box.current.requestFullscreen();
+      else setExpanded(true);
+    } catch { setExpanded(true); }
+  }
 
   useEffect(() => { if (ref.current) ref.current.playbackRate = speed; }, [speed, src]);
   useEffect(() => {
@@ -48,10 +75,10 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
   }
 
   return (
-    <div className="group relative" dir="ltr">
+    <div ref={box} className={expanded ? "group fixed inset-0 z-50 bg-navy" : "group relative bg-navy"} dir="ltr">
       <video
-        ref={ref} src={src} controls controlsList="nodownload noplaybackrate" disablePictureInPicture playsInline
-        className="aspect-video w-full bg-navy"
+        ref={ref} src={src} controls controlsList="nodownload noplaybackrate nofullscreen" disablePictureInPicture playsInline
+        className={full || expanded ? "h-full w-full bg-navy" : "aspect-video w-full bg-navy"}
         onLoadedMetadata={(e) => {
           e.currentTarget.playbackRate = speed;
           setHasTracks(e.currentTarget.textTracks.length > 0);
@@ -67,13 +94,20 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
           {flash === "right" ? "+10 ث" : "−10 ث"}
         </div>
       )}
-      <DropdownMenu dir="rtl">
+      <div className="absolute bottom-14 right-2 flex shrink-0 items-center gap-1 rounded-md bg-navy/90 p-1 text-navy-foreground">
+      <Button size="icon" variant="ghost" disabled={!hasTracks} onClick={() => setCc((c) => !c)} aria-pressed={cc} aria-label="الترجمة CC" title={hasTracks ? "الترجمة CC" : "لا توجد ترجمة لهذا الفيديو"} className="text-navy-foreground hover:bg-navy">
+        <Captions className="h-5 w-5" />
+      </Button>
+      <Button size="icon" variant="ghost" onClick={toggleFull} aria-label={full || expanded ? "خروج من ملء الشاشة" : "ملء الشاشة"} title={full || expanded ? "خروج من ملء الشاشة" : "ملء الشاشة"} className="text-navy-foreground hover:bg-navy">
+        {full || expanded ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
+      </Button>
+      <DropdownMenu dir="rtl" modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button size="icon" variant="ghost" aria-label="إعدادات الفيديو" title="إعدادات الفيديو" className="absolute right-3 top-3 rounded-full bg-navy/70 text-navy-foreground hover:bg-navy">
+          <Button size="icon" variant="ghost" aria-label="إعدادات الفيديو" title="إعدادات الفيديو" className="text-navy-foreground hover:bg-navy">
             <MoreVertical className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuContent align="end" className="w-56" container={box.current ?? undefined}>
           <DropdownMenuLabel className="flex items-center gap-2"><Gauge className="h-4 w-4" />السُّرْعَة</DropdownMenuLabel>
           <div className="grid grid-cols-3 gap-1 px-1 pb-1">
             {SPEEDS.map((s) => (
@@ -89,6 +123,7 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      </div>
     </div>
   );
 }

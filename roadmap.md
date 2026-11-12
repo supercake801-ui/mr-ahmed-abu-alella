@@ -1,5 +1,7 @@
 # Requested platform development
 
+- [ ] Latest final brief: full-card links/touch states, persistent fullscreen toolbar, real quality sources and WebVTT, searchable student management, interactive courses, announcements and independent themes.
+- [x] Historical home photo loads at desktop/phone widths; existing lesson fullscreen menu and 3× speed verified in Chromium. Native iPhone fullscreen still cannot retain custom controls.
 - [ ] Secure primary owner and temporary teacher assignment; protect owner and preserve all existing accounts.
 - [ ] Teacher/owner account management table; role controls and guarded deletion.
 - [ ] Add students with required grade, student/guardian phones, ID and scanner Enter support.
