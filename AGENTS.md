@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep playback controls in the shared VideoPlayer; staff preview links use the same watch page so student and teacher controls stay identical.
+- Portal video menus into the player container so they remain accessible in container fullscreen.
