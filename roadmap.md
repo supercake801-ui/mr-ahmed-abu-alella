@@ -1,7 +1,7 @@
 # Requested platform development
 
 - [ ] Latest final brief: full-card links/touch states, persistent fullscreen toolbar, real quality sources and WebVTT, searchable student management, interactive courses, announcements and independent themes.
-- [ ] Current repair: historical image in a separate right-hand frame, welcome text left; one shared video toolbar for play, sound, CC, fullscreen and settings; verify desktop/mobile and fullscreen.
+- [x] Current repair: historical image in a separate right-hand frame, welcome text left; shared play/sound/CC/fullscreen/settings toolbar. Chromium checked at 1280px and 390px: actual lesson playback, mute/unmute, fullscreen settings and 3× speed. CC remains unavailable without caption tracks; other browsers/devices unverified.
 - [ ] Secure primary owner and temporary teacher assignment; protect owner and preserve all existing accounts.
 - [ ] Teacher/owner account management table; role controls and guarded deletion.
 - [ ] Add students with required grade, student/guardian phones, ID and scanner Enter support.
