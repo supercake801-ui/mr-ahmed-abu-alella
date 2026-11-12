@@ -170,6 +170,6 @@
 @utility hero-art-fade {
   mask-image: linear-gradient(to top, black 35%, transparent 75%);
   @media (min-width: 768px) {
-    mask-image: linear-gradient(to right, black 30%, transparent 62%);
+    mask-image: linear-gradient(to right, black 55%, transparent 100%);
   }
 }
