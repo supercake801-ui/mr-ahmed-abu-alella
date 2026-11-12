@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Captions, Check, Gauge, MoreVertical, Settings2 } from "lucide-react";
+import { Captions, Check, Gauge, Maximize, Minimize, MoreVertical, Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -22,6 +22,21 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
   const [hasTracks, setHasTracks] = useState(false);
   const [flash, setFlash] = useState<null | "left" | "right">(null);
   const lastTap = useRef(0);
+  const box = useRef<HTMLDivElement>(null);
+  const [full, setFull] = useState(false);
+  useEffect(() => {
+    const on = () => setFull(document.fullscreenElement === box.current);
+    document.addEventListener("fullscreenchange", on);
+    return () => document.removeEventListener("fullscreenchange", on);
+  }, []);
+  function toggleFull() {
+    const el = box.current as (HTMLDivElement & { webkitRequestFullscreen?: () => void }) | null;
+    const v = ref.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
+    if (document.fullscreenElement) { void document.exitFullscreen(); return; }
+    if (el?.requestFullscreen) void el.requestFullscreen();
+    else if (el?.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else v?.webkitEnterFullscreen?.(); // iPhone: native player only
+  }
 
   useEffect(() => { if (ref.current) ref.current.playbackRate = speed; }, [speed, src]);
   useEffect(() => {
@@ -48,10 +63,10 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
   }
 
   return (
-    <div className="group relative" dir="ltr">
+    <div ref={box} className="group relative bg-navy" dir="ltr">
       <video
-        ref={ref} src={src} controls controlsList="nodownload noplaybackrate" disablePictureInPicture playsInline
-        className="aspect-video w-full bg-navy"
+        ref={ref} src={src} controls controlsList="nodownload noplaybackrate nofullscreen" disablePictureInPicture playsInline
+        className={full ? "h-full w-full bg-navy" : "aspect-video w-full bg-navy"}
         onLoadedMetadata={(e) => {
           e.currentTarget.playbackRate = speed;
           setHasTracks(e.currentTarget.textTracks.length > 0);
@@ -67,13 +82,16 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
           {flash === "right" ? "+10 ث" : "−10 ث"}
         </div>
       )}
-      <DropdownMenu dir="rtl">
+      <Button size="icon" variant="ghost" onClick={toggleFull} aria-label={full ? "خروج من ملء الشاشة" : "ملء الشاشة"} title={full ? "خروج من ملء الشاشة" : "ملء الشاشة"} className="absolute right-14 top-3 rounded-full bg-navy/70 text-navy-foreground hover:bg-navy">
+        {full ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
+      </Button>
+      <DropdownMenu dir="rtl" modal={false}>
         <DropdownMenuTrigger asChild>
           <Button size="icon" variant="ghost" aria-label="إعدادات الفيديو" title="إعدادات الفيديو" className="absolute right-3 top-3 rounded-full bg-navy/70 text-navy-foreground hover:bg-navy">
             <MoreVertical className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuContent align="end" className="w-56" container={box.current ?? undefined}>
           <DropdownMenuLabel className="flex items-center gap-2"><Gauge className="h-4 w-4" />السُّرْعَة</DropdownMenuLabel>
           <div className="grid grid-cols-3 gap-1 px-1 pb-1">
             {SPEEDS.map((s) => (
