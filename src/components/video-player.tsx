@@ -67,13 +67,13 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
           {flash === "right" ? "+10 ث" : "−10 ث"}
         </div>
       )}
-      <DropdownMenu>
+      <DropdownMenu dir="rtl">
         <DropdownMenuTrigger asChild>
           <Button size="icon" variant="ghost" aria-label="إعدادات الفيديو" title="إعدادات الفيديو" className="absolute right-3 top-3 rounded-full bg-navy/70 text-navy-foreground hover:bg-navy">
             <MoreVertical className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent dir="rtl" align="end" className="w-56">
+        <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel className="flex items-center gap-2"><Gauge className="h-4 w-4" />السُّرْعَة</DropdownMenuLabel>
           <div className="grid grid-cols-3 gap-1 px-1 pb-1">
             {SPEEDS.map((s) => (
