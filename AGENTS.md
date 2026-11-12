@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep playback controls in the shared VideoPlayer; staff preview links use the same watch page so student and teacher controls stay identical.

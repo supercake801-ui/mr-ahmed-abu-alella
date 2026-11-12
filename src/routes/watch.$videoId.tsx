@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getPlaybackUrl } from "@/lib/platform.functions";
 import { errMsg } from "@/lib/data";
+import { VideoPlayer } from "@/components/video-player";
 
 export const Route = createFileRoute("/watch/$videoId")({
   head: () => ({
@@ -28,8 +29,6 @@ export const Route = createFileRoute("/watch/$videoId")({
   ),
 });
 
-const SPEEDS = [1, 1.25, 1.5, 2, 3];
-
 function Watch() {
   const { videoId } = Route.useParams();
   const meta = useQuery({
@@ -45,8 +44,6 @@ function Watch() {
   const [pw, setPw] = useState("");
   const [msg, setMsg] = useState("");
   const pwRef = useRef<string | undefined>(undefined);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [speed, setSpeed] = useState(1);
   const resumeAt = useRef(0);
 
   async function request(password?: string) {
@@ -71,13 +68,8 @@ function Watch() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [meta.data]);
 
-  useEffect(() => {
-    if (videoRef.current) videoRef.current.playbackRate = speed;
-  }, [speed, url]);
-
-  function onVideoError() {
-    // Most likely the temporary link expired: re-check access on the server and resume.
-    resumeAt.current = videoRef.current?.currentTime ?? 0;
+  function onVideoError(time: number) {
+    resumeAt.current = time;
     setMsg("انقطع التشغيل أو انتهت صلاحية رابط المشاهدة المؤقت.");
     setState("error");
   }
@@ -92,20 +84,7 @@ function Watch() {
       <h1 className="mt-2 font-display text-2xl text-navy md:text-3xl">{v.title}</h1>
       <div className="mt-4 overflow-hidden rounded-xl bg-navy">
         {state === "ready" && url ? (
-          <video
-            ref={videoRef}
-            src={url}
-            controls
-            controlsList="nodownload"
-            playsInline
-            className="aspect-video w-full bg-navy"
-            onLoadedMetadata={(e) => {
-              e.currentTarget.playbackRate = speed;
-              if (resumeAt.current) e.currentTarget.currentTime = resumeAt.current;
-            }}
-            onError={onVideoError}
-            onContextMenu={(e) => e.preventDefault()}
-          />
+          <VideoPlayer src={url} initialTime={resumeAt.current} onError={onVideoError} />
         ) : (
           <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 p-6 text-center text-navy-foreground">
             {(state === "loading" || state === "idle") && <p>جارٍ التحقق من صلاحية المشاهدة…</p>}
@@ -128,15 +107,12 @@ function Watch() {
           </div>
         )}
       </div>
-      {state === "ready" && (
-        <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="سرعة التشغيل">
-          <span className="text-sm text-muted-foreground">السرعة:</span>
-          {SPEEDS.map((s) => (
-            <Button key={s} size="sm" variant={s === speed ? "default" : "outline"} onClick={() => setSpeed(s)} aria-pressed={s === speed}>{s}×</Button>
-          ))}
-        </div>
+      {v.description && (
+        <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+          <h2 className="mb-3 font-display text-xl text-navy">وَصْفُ الدَّرْس</h2>
+          <p className="whitespace-pre-line text-lg leading-loose text-foreground/85">{v.description}</p>
+        </section>
       )}
-      {v.description && <p className="mt-6 whitespace-pre-line text-muted-foreground">{v.description}</p>}
     </div>
   );
 }
