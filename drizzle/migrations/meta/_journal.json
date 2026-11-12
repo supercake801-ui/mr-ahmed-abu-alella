@@ -8,6 +8,13 @@
       "when": 1792162625811,
       "tag": "0000_import_asad_al_tarikh_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794515219977,
+      "tag": "0001_admin_exclusive_teacher_role",
+      "breakpoints": true
     }
   ]
 }

@@ -281,6 +281,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_set_teacher_role: {
+        Args: { _grant: boolean; _user_id: string }
+        Returns: undefined
+      }
       check_video_password: {
         Args: { _password: string; _video_id: string }
         Returns: boolean
