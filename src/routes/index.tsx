@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CourseCard } from "@/components/course-card";
 import { EmptyState } from "@/components/site-shell";
-import { useCourses, useTeacherPhoto, useTeacherProfile } from "@/lib/data";
+import { useCourses, useTeacherProfile } from "@/lib/data";
 import { useAuth } from "@/lib/auth";
 import { TeacherReviews } from "@/components/teacher-reviews";
 
@@ -26,15 +26,13 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { session } = useAuth();
   const teacher = useTeacherProfile();
-  const photo = useTeacherPhoto().url;
   const courses = useCourses(1);
 
   return (
     <>
-      <section className="relative overflow-hidden bg-[image:var(--gradient-hero)] text-navy-foreground">
-        <img src={themeArt.url} alt="" aria-hidden className="hero-art-fade pointer-events-none absolute inset-y-0 left-0 h-full w-full object-cover object-top opacity-35 md:w-[55%]" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
-          <div>
+      <section className="overflow-hidden bg-navy text-navy-foreground">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-8 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:py-10" dir="ltr">
+          <div className="min-w-0" dir="rtl">
             <p className="mb-3 inline-block rounded-full bg-gold/20 px-3 py-1 text-sm text-gold">الدراسات الاجتماعية — تاريخ وجغرافيا</p>
             <h1 className="font-display text-4xl leading-tight md:text-5xl">
               ذاكر التاريخ مع <span className="text-gold">أسد التاريخ</span>
@@ -51,16 +49,9 @@ function Home() {
               </Button>
             </div>
           </div>
-          <div className="flex justify-center">
-            <div className="relative">
-              <div className="absolute -inset-3 rounded-full bg-[image:var(--gradient-gold)] opacity-70 blur-xl" />
-              {photo ? (
-                <img src={photo} alt="أ. أحمد أبو العلا" className="relative h-64 w-64 rounded-full border-4 border-gold object-cover md:h-80 md:w-80" />
-              ) : (
-                <div className="relative h-64 w-64 rounded-full border-4 border-gold bg-navy md:h-80 md:w-80" aria-hidden />
-              )}
-            </div>
-          </div>
+          <figure className="mx-auto w-full max-w-sm overflow-hidden rounded-lg border-2 border-gold/60 shadow-[var(--shadow-card)] md:max-w-none">
+            <img src={themeArt.url} alt="أحمد أبو العلا بشخصية محمد علي في إطار تاريخي" className="aspect-[4/3] w-full object-cover object-top" fetchPriority="high" />
+          </figure>
         </div>
       </section>
 

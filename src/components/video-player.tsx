@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Captions, Check, Gauge, Maximize, Minimize, MoreVertical, Settings2 } from "lucide-react";
+import { Captions, Check, Gauge, Maximize, Minimize, MoreVertical, Settings2, Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -18,6 +18,18 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
   const ref = useRef<HTMLVideoElement>(null);
   const resumeAt = useRef(initialTime);
   const [speed, setSpeed] = useState(1);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [time, setTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
+  function togglePlay() {
+    const video = ref.current;
+    if (!video) return;
+    if (video.paused) void video.play().catch(() => setPlaying(false));
+    else video.pause();
+  }
   const [cc, setCc] = useState(false);
   const [hasTracks, setHasTracks] = useState(false);
   const [flash, setFlash] = useState<null | "left" | "right">(null);
@@ -69,16 +81,21 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
     } else {
       lastTap.current = now;
       window.setTimeout(() => {
-        if (lastTap.current === now) { lastTap.current = 0; if (v.paused) void v.play(); else v.pause(); }
+        if (lastTap.current === now) { lastTap.current = 0; togglePlay(); }
       }, 300);
     }
   }
 
   return (
-    <div ref={box} className={expanded ? "group fixed inset-0 z-50 bg-navy" : "group relative bg-navy"} dir="ltr">
+    <div ref={box} className={expanded ? "group fixed inset-0 z-50 flex flex-col bg-navy" : `group relative flex flex-col bg-navy ${full ? "h-full w-full" : ""}`} dir="ltr">
+      <div className={`relative min-h-0 ${full || expanded ? "flex-1" : ""}`}>
       <video
-        ref={ref} src={src} controls controlsList="nodownload noplaybackrate nofullscreen" disablePictureInPicture playsInline
-        className={full || expanded ? "h-full w-full bg-navy" : "aspect-video w-full bg-navy"}
+        ref={ref} src={src} disablePictureInPicture playsInline
+        onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+        onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+        onDurationChange={(e) => setDuration(Number.isFinite(e.currentTarget.duration) ? e.currentTarget.duration : 0)}
+        onVolumeChange={(e) => { setMuted(e.currentTarget.muted); setVolume(e.currentTarget.volume); }}
+        className={full || expanded ? "h-full w-full object-contain bg-navy" : "block aspect-video w-full bg-navy"}
         onLoadedMetadata={(e) => {
           e.currentTarget.playbackRate = speed;
           setHasTracks(e.currentTarget.textTracks.length > 0);
@@ -87,23 +104,33 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
         onError={() => { resumeAt.current = ref.current?.currentTime ?? 0; onError?.(resumeAt.current); }}
         onContextMenu={(e) => e.preventDefault()}
       />
-      {/* Tap layer leaves the native control bar usable. */}
-      <div className="absolute inset-x-0 top-0 bottom-14 select-none" onPointerUp={tap} aria-hidden />
+      <div className="absolute inset-0 select-none" onPointerUp={tap} aria-hidden />
       {flash && (
         <div className={`pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full bg-navy/70 px-4 py-2 text-lg font-bold text-navy-foreground ${flash === "right" ? "right-[18%]" : "left-[18%]"}`}>
           {flash === "right" ? "+10 ث" : "−10 ث"}
         </div>
       )}
-      <div className="absolute bottom-14 right-2 flex shrink-0 items-center gap-1 rounded-md bg-navy/90 p-1 text-navy-foreground">
-      <Button size="icon" variant="ghost" disabled={!hasTracks} onClick={() => setCc((c) => !c)} aria-pressed={cc} aria-label="الترجمة CC" title={hasTracks ? "الترجمة CC" : "لا توجد ترجمة لهذا الفيديو"} className="text-navy-foreground hover:bg-navy">
+      </div>
+      <div className="relative z-10 w-full shrink-0 bg-navy px-2 pb-2 pt-1 text-navy-foreground" role="group" aria-label="شريط تحكم الفيديو">
+        <input type="range" min={0} max={duration || 1} step={0.1} value={Math.min(time, duration || 1)} aria-label="موضع تشغيل الفيديو" disabled={!duration} onChange={(e) => { if (ref.current) ref.current.currentTime = Number(e.target.value); }} className="block h-5 w-full cursor-pointer accent-gold" />
+        <div className="flex min-w-0 items-center gap-1">
+          <Button size="icon" variant="ghost" onClick={togglePlay} aria-label={playing ? "إيقاف مؤقت" : "تشغيل الفيديو"} title={playing ? "إيقاف مؤقت" : "تشغيل الفيديو"} className="shrink-0 text-navy-foreground hover:bg-navy-foreground/10">
+            {playing ? <Pause /> : <Play />}
+          </Button>
+          <Button size="icon" variant="ghost" onClick={() => { if (ref.current) ref.current.muted = !ref.current.muted; }} aria-label={muted ? "تشغيل الصوت" : "كتم الصوت"} title={muted ? "تشغيل الصوت" : "كتم الصوت"} className="shrink-0 text-navy-foreground hover:bg-navy-foreground/10">
+            {muted || volume === 0 ? <VolumeX /> : <Volume2 />}
+          </Button>
+          <input type="range" min={0} max={1} step={0.05} value={muted ? 0 : volume} aria-label="مستوى الصوت" onChange={(e) => { if (ref.current) { ref.current.volume = Number(e.target.value); ref.current.muted = false; } }} className="hidden h-5 w-20 shrink-0 cursor-pointer accent-gold sm:block" />
+          <span className="min-w-0 flex-1 whitespace-nowrap text-center text-xs tabular-nums">{clock(time)} / {clock(duration)}</span>
+      <Button size="icon" variant="ghost" disabled={!hasTracks} onClick={() => setCc((c) => !c)} aria-pressed={cc} aria-label="الترجمة CC" title={hasTracks ? "الترجمة CC" : "لا توجد ترجمة لهذا الفيديو"} className="shrink-0 text-navy-foreground hover:bg-navy-foreground/10">
         <Captions className="h-5 w-5" />
       </Button>
-      <Button size="icon" variant="ghost" onClick={toggleFull} aria-label={full || expanded ? "خروج من ملء الشاشة" : "ملء الشاشة"} title={full || expanded ? "خروج من ملء الشاشة" : "ملء الشاشة"} className="text-navy-foreground hover:bg-navy">
+      <Button size="icon" variant="ghost" onClick={toggleFull} aria-label={full || expanded ? "خروج من ملء الشاشة" : "ملء الشاشة"} title={full || expanded ? "خروج من ملء الشاشة" : "ملء الشاشة"} className="shrink-0 text-navy-foreground hover:bg-navy-foreground/10">
         {full || expanded ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
       </Button>
       <DropdownMenu dir="rtl" modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button size="icon" variant="ghost" aria-label="إعدادات الفيديو" title="إعدادات الفيديو" className="text-navy-foreground hover:bg-navy">
+          <Button size="icon" variant="ghost" aria-label="إعدادات الفيديو" title="إعدادات الفيديو" className="shrink-0 text-navy-foreground hover:bg-navy-foreground/10">
             <MoreVertical className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
@@ -123,6 +150,7 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+        </div>
       </div>
     </div>
   );

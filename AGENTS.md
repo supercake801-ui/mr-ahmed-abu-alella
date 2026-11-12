@@ -11,3 +11,5 @@
 
 - Keep playback controls in the shared VideoPlayer; staff preview links use the same watch page so student and teacher controls stay identical.
 - Portal video menus into the player container so they remain accessible in container fullscreen.
+
+- Use a single custom video control bar instead of native controls so sound and playback tools retain stable positions in container fullscreen.
