@@ -1,10 +1,10 @@
 # Requested platform development
 
-- [ ] Current focused request: improve Arabic/English caption context and audio extraction, persist caption sizes, activate failed/uploading studio cards, and recheck existing cloud quality playback. Physical iOS/Android and Windows/Mac browsers require separate device testing.
+- [x] Current focused request: Arabic/English automatic or explicit language selection, spelling context, single audio extraction and settings-aware cache; existing video regenerated and saved through studio. Persisted caption sizes and full-card recovery for failed/uploading studio videos. Authenticated Chromium checked studio card navigation, actual 480p/720p/1080p sources, Auto, caption overlay, restored size and mobile fullscreen settings; 11 tests passed. Comparative Arabic accuracy/latency and physical iOS/Android/Windows/Mac testing remain unverified.
 
 - [x] Phase one: four caption sizes, genuine 480p/720p/1080p and Auto switching preserving playback, course/video thumbnail links and touch feedback. Chromium desktop/mobile/touch checked; 7 tests passed. Existing portrait video variants are resized encodes, not recovered detail; physical Android/iPhone unverified.
 
-- [ ] Current exclusive request: real quality sources and Auto selection, staff-generated cached captions and WebVTT, verified on actual video. Other platform tasks deferred outside this request.
+- [x] Current exclusive request: real quality sources and Auto selection, staff-generated cached captions and WebVTT, verified on actual video. Other platform tasks deferred outside this request.
 
 - [ ] Latest final brief: full-card links/touch states, persistent fullscreen toolbar, real quality sources and WebVTT, searchable student management, interactive courses, announcements and independent themes.
 - [x] Current repair: historical image in a separate right-hand frame, welcome text left; shared play/sound/CC/fullscreen/settings toolbar. Chromium checked at 1280px and 390px: actual lesson playback, mute/unmute, fullscreen settings and 3× speed. CC remains unavailable without caption tracks; other browsers/devices unverified.
