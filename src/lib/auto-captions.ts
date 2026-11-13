@@ -8,10 +8,11 @@ export async function generateCaptions(videoId: string, source: string, duration
   const { toBlobURL } = await import('@ffmpeg/util');
   const ffmpeg = new FFmpeg();
   const wasmURL = await toBlobURL(wasm.url, 'application/wasm');
+  const coreURL = await toBlobURL('/ffmpeg/ffmpeg-core.js', 'text/javascript');
   const cues: CaptionCue[] = [];
   try {
     progress('جارٍ تجهيز الصوت…');
-    await ffmpeg.load({ coreURL: '/ffmpeg/ffmpeg-core.js', wasmURL });
+    await ffmpeg.load({ coreURL, wasmURL });
     const response = await fetch(source, { signal });
     if (!response.ok) throw new Error('تعذر تحميل ملف الفيديو');
     await ffmpeg.writeFile('source', new Uint8Array(await response.arrayBuffer()));
@@ -31,5 +32,5 @@ export async function generateCaptions(videoId: string, source: string, duration
     }
     if (!cues.length) throw new Error('لا يوجد كلام قابل للتحويل في الفيديو');
     return cuesToVtt(cues);
-  } finally { ffmpeg.terminate(); URL.revokeObjectURL(wasmURL); }
+  } finally { ffmpeg.terminate(); URL.revokeObjectURL(wasmURL); URL.revokeObjectURL(coreURL); }
 }
