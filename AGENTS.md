@@ -13,3 +13,5 @@
 - Portal video menus into the player container so they remain accessible in container fullscreen.
 
 - Use a single custom video control bar instead of native controls so sound and playback tools retain stable positions in container fullscreen.
+- Store real quality file paths and cached WebVTT per video; sign them only after the existing playback access/password check, so alternate media cannot bypass lesson protection.
+- Generate captions once through staff-authorized sequential audio-window transcription; use source-window timing (approximate, not word alignment) and browser-only FFmpeg because the published server cannot run native media binaries.

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Captions, Check, Gauge, Maximize, Minimize, MoreVertical, Settings2, Play, Pause, Volume2, VolumeX } from "lucide-react";
+import { autoQuality, type QualitySource } from "@/lib/video-media";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -14,9 +15,27 @@ export function doubleTapTarget(current: number, duration: number, side: "left" 
   return Math.max(0, Math.min(Number.isFinite(duration) ? duration : next, next));
 }
 
-export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; initialTime?: number; onError?: (time: number) => void }) {
+export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, onError }: { src: string; sources?: QualitySource[]; captionsVtt?: string | null; initialTime?: number; onError?: (time: number) => void }) {
   const ref = useRef<HTMLVideoElement>(null);
   const resumeAt = useRef(initialTime);
+  const resumePlaying = useRef(false);
+  const [quality, setQuality] = useState("Auto");
+  const [activeSrc, setActiveSrc] = useState(src);
+  const [captionUrl, setCaptionUrl] = useState<string>();
+  useEffect(() => {
+    if (!captionsVtt) { setCaptionUrl(undefined); return; }
+    const url = URL.createObjectURL(new Blob([captionsVtt], { type: 'text/vtt' }));
+    setCaptionUrl(url); return () => URL.revokeObjectURL(url);
+  }, [captionsVtt]);
+  function changeQuality(label: string) {
+    const all = [{ label: 'المصدر الأصلي', url: src }, ...sources];
+    const chosen = label === 'Auto' ? autoQuality(all, box.current?.clientWidth ?? 1280, (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) : all.find(s => s.label === label);
+    if (!chosen) return;
+    resumeAt.current = ref.current?.currentTime ?? 0;
+    resumePlaying.current = !!ref.current && !ref.current.paused;
+    setQuality(label); setActiveSrc(chosen.url);
+  }
+  useEffect(() => { setActiveSrc(src); setQuality('Auto'); }, [src]);
   const [speed, setSpeed] = useState(1);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -67,7 +86,7 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
     const tracks = ref.current?.textTracks;
     if (!tracks) return;
     for (const t of Array.from(tracks)) t.mode = cc ? "showing" : "hidden";
-  }, [cc]);
+  }, [cc, captionUrl, activeSrc]);
 
   function tap(e: React.PointerEvent<HTMLDivElement>) {
     const v = ref.current; if (!v) return;
@@ -90,7 +109,7 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
     <div ref={box} className={expanded ? "group fixed inset-0 z-50 flex flex-col bg-navy" : `group relative flex flex-col bg-navy ${full ? "h-full w-full" : ""}`} dir="ltr">
       <div className={`relative min-h-0 ${full || expanded ? "flex-1" : ""}`}>
       <video
-        ref={ref} src={src} disablePictureInPicture playsInline
+        ref={ref} src={activeSrc} disablePictureInPicture playsInline
         onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
         onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
         onDurationChange={(e) => setDuration(Number.isFinite(e.currentTarget.duration) ? e.currentTarget.duration : 0)}
@@ -100,10 +119,13 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
           e.currentTarget.playbackRate = speed;
           setHasTracks(e.currentTarget.textTracks.length > 0);
           if (resumeAt.current) e.currentTarget.currentTime = resumeAt.current;
+          if (resumePlaying.current) { resumePlaying.current = false; void e.currentTarget.play().catch(() => setPlaying(false)); }
         }}
         onError={() => { resumeAt.current = ref.current?.currentTime ?? 0; onError?.(resumeAt.current); }}
         onContextMenu={(e) => e.preventDefault()}
-      />
+      >
+        {captionUrl && <track key={captionUrl} kind="captions" src={captionUrl} srcLang="ar" label="العربية" onLoad={() => { setHasTracks(true); const tracks = ref.current?.textTracks; if (tracks) for (const t of Array.from(tracks)) t.mode = cc ? 'showing' : 'hidden'; }} />}
+      </video>
       <div className="absolute inset-0 select-none" onPointerUp={tap} aria-hidden />
       {flash && (
         <div className={`pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full bg-navy/70 px-4 py-2 text-lg font-bold text-navy-foreground ${flash === "right" ? "right-[18%]" : "left-[18%]"}`}>
@@ -143,7 +165,7 @@ export function VideoPlayer({ src, initialTime = 0, onError }: { src: string; in
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuLabel className="flex items-center gap-2"><Settings2 className="h-4 w-4" />الجَوْدَة</DropdownMenuLabel>
-          <DropdownMenuItem><Check className="h-4 w-4" />تلقائي (Auto) — أفضل جودة متاحة</DropdownMenuItem>
+          {['Auto', 'المصدر الأصلي', ...sources.map(s => s.label)].map(label => <DropdownMenuItem key={label} onSelect={() => changeQuality(label)}>{quality === label && <Check className="h-4 w-4" />}{label === 'Auto' ? 'تلقائي (Auto)' : label}</DropdownMenuItem>)}
           <DropdownMenuSeparator />
           <DropdownMenuItem disabled={!hasTracks} onSelect={() => setCc((c) => !c)}>
             <Captions className="h-4 w-4" />CC: {hasTracks ? (cc ? "تشغيل" : "إيقاف") : "لا توجد ترجمة لهذا الفيديو"}

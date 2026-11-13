@@ -150,7 +150,7 @@ export const getPlaybackUrl = createServerFn({ method: "POST" })
     // RLS decides whether this user may see the video at all (published, active user, published course).
     const { data: v } = await context.supabase
       .from("videos")
-      .select("id, video_path, status, has_password")
+      .select("id, video_path, status, has_password, quality_paths, captions_vtt")
       .eq("id", data.videoId)
       .maybeSingle();
     if (!v || !v.video_path || v.status === "uploading" || v.status === "failed")
@@ -169,7 +169,12 @@ export const getPlaybackUrl = createServerFn({ method: "POST" })
       .from("videos")
       .createSignedUrl(v.video_path, PLAYBACK_TTL);
     if (error || !s) throw new Error("تعذر تجهيز رابط المشاهدة");
-    return { ok: true as const, url: s.signedUrl, expiresIn: PLAYBACK_TTL };
+    const qualities = await Promise.all(Object.entries((v.quality_paths ?? {}) as Record<string, string>).map(async ([height, path]) => {
+      if (!['480','720','1080'].includes(height) || !path.startsWith(`${v.id}/`)) return null;
+      const { data: signed } = await supabaseAdmin.storage.from('videos').createSignedUrl(path, PLAYBACK_TTL);
+      return signed ? { label: `${height}p`, height: Number(height), url: signed.signedUrl } : null;
+    }));
+    return { ok: true as const, url: s.signedUrl, qualities: qualities.filter(q => q !== null), captionsVtt: v.captions_vtt, expiresIn: PLAYBACK_TTL };
   });
 
 /* ---------------- Account ---------------- */

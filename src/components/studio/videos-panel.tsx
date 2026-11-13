@@ -25,6 +25,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Database } from "@/integrations/supabase/types";
+import { VideoMediaPanel } from './video-media-panel';
 
 type Video = Database["public"]["Tables"]["videos"]["Row"] & { courses: { title: string } | null };
 
@@ -289,6 +290,7 @@ function EditDialog({ video, onClose }: { video: Video; onClose: () => void }) {
               }} /></label></Button>
           </div>
           <Button className="w-full" disabled={busy} onClick={save}>{busy ? "جارٍ الحفظ…" : "حفظ"}</Button>
+          <VideoMediaPanel videoId={video.id} />
         </div>
       </DialogContent>
     </Dialog>

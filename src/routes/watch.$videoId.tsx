@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getPlaybackUrl } from "@/lib/platform.functions";
 import { errMsg } from "@/lib/data";
+import type { QualitySource } from "@/lib/video-media";
 import { VideoPlayer } from "@/components/video-player";
 
 export const Route = createFileRoute("/watch/$videoId")({
@@ -41,6 +42,8 @@ function Watch() {
   });
   const [state, setState] = useState<"idle" | "loading" | "need_pw" | "wrong_pw" | "ready" | "error" | "unavailable">("idle");
   const [url, setUrl] = useState<string | null>(null);
+  const [qualities, setQualities] = useState<QualitySource[]>([]);
+  const [captionsVtt, setCaptionsVtt] = useState<string | null>(null);
   const [pw, setPw] = useState("");
   const [msg, setMsg] = useState("");
   const pwRef = useRef<string | undefined>(undefined);
@@ -52,7 +55,7 @@ function Watch() {
       const r = await getPlaybackUrl({ data: { videoId, password } });
       if (r.ok) {
         pwRef.current = password;
-        setUrl(r.url);
+        setUrl(r.url); setQualities(r.qualities); setCaptionsVtt(r.captionsVtt);
         setState("ready");
       } else if (r.reason === "password_required") setState("need_pw");
       else if (r.reason === "wrong_password") setState("wrong_pw");
@@ -84,7 +87,7 @@ function Watch() {
       <h1 className="mt-2 font-display text-2xl text-navy md:text-3xl">{v.title}</h1>
       <div className="mt-4 overflow-hidden rounded-xl bg-navy">
         {state === "ready" && url ? (
-          <VideoPlayer src={url} initialTime={resumeAt.current} onError={onVideoError} />
+          <VideoPlayer src={url} sources={qualities} captionsVtt={captionsVtt} initialTime={resumeAt.current} onError={onVideoError} />
         ) : (
           <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 p-6 text-center text-navy-foreground">
             {(state === "loading" || state === "idle") && <p>جارٍ التحقق من صلاحية المشاهدة…</p>}
