@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from '@tanstack/react-router';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
@@ -77,14 +78,14 @@ export function CoursesPanel() {
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {data.rows.map((c) => (
-              <div key={c.id} className="overflow-hidden rounded-xl border bg-card">
+              <div key={c.id} className="group relative overflow-hidden rounded-xl border bg-card">
                 <div className="aspect-video overflow-hidden"><CourseCover course={c} /></div>
                 <div className="space-y-2 p-4">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-semibold">{c.title}</h3>
+                    <h3 className="font-semibold"><Link to="/courses/$courseId" params={{courseId:c.id}} className="media-card-link after:absolute after:inset-0 after:content-['']">{c.title}</Link></h3>
                     <Badge variant={c.is_published ? "default" : "secondary"}>{c.is_published ? "منشور" : "مسودة"}</Badge>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="relative z-10 flex w-fit flex-wrap gap-2">
                     <Button size="sm" variant="outline" onClick={() => setEditing(c)}><Pencil className="ml-1 h-4 w-4" />تعديل</Button>
                     <Button size="sm" variant="outline" disabled={publishing === c.id} onClick={() => togglePublish(c)}>
                       {publishing === c.id ? "…" : c.is_published ? "إلغاء النشر" : "نشر"}

@@ -22,7 +22,7 @@ export function CourseCard({ course }: { course: Course }) {
     <Link
       to="/courses/$courseId"
       params={{ courseId: course.id }}
-      className="group overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      className="media-card-link group block overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >
       <div className="aspect-video overflow-hidden">
         <CourseCover course={course} className="transition-transform group-hover:scale-105 motion-reduce:transition-none" />

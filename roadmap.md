@@ -1,5 +1,7 @@
 # Requested platform development
 
+- [ ] Phase one: caption-size menu, genuine quality selection/Auto, full-area course/video thumbnail links and touch feedback; desktop/mobile verification.
+
 - [ ] Current exclusive request: real quality sources and Auto selection, staff-generated cached captions and WebVTT, verified on actual video. Other platform tasks deferred outside this request.
 
 - [ ] Latest final brief: full-card links/touch states, persistent fullscreen toolbar, real quality sources and WebVTT, searchable student management, interactive courses, announcements and independent themes.
