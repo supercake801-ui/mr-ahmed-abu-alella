@@ -15,6 +15,10 @@ export const transcribeVideoChunk = createServerFn({ method: 'POST' })
     const { data: admin } = await context.supabase.rpc('has_role', { _user_id: context.userId, _role: 'admin' });
     if (!video || !staff || (video.owner_id !== context.userId && !admin)) throw new Error('توليد الترجمة لصاحب الفيديو أو الإدارة فقط');
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
+    const hashBytes = new Uint8Array(await crypto.subtle.digest('SHA-256', await file.arrayBuffer()));
+    const audioHash = Array.from(hashBytes, b => b.toString(16).padStart(2, '0')).join('');
+    const { data: cached } = await (supabaseAdmin as any).from('video_caption_chunks').select('text').eq('video_id', videoId).eq('audio_hash', audioHash).maybeSingle();
+    if (cached) return { text: cached.text as string };
     const { data: state } = await supabaseAdmin.from('video_ai_state').select('*').eq('id', true).maybeSingle();
     if (state?.blocked) throw new Error(state.reason ?? 'توليد الترجمة متوقف؛ استعد الوصول أولًا');
     const key = process.env['LOVABLE_API_KEY'];
@@ -29,6 +33,7 @@ export const transcribeVideoChunk = createServerFn({ method: 'POST' })
     }
     let text = ''; let done = false; let failure = '';
     const parser = createParser({ onEvent(event) {
+      if (event.data === '[DONE]') return;
       const value = JSON.parse(event.data);
       if (value.type === 'transcript.text.delta') text += value.delta ?? '';
       if (value.type === 'transcript.text.done') { text = value.text ?? text; done = true; }
@@ -39,5 +44,6 @@ export const transcribeVideoChunk = createServerFn({ method: 'POST' })
     while (true) { const part = await reader.read(); if (part.done) break; parser.feed(decoder.decode(part.value, { stream: true })); }
     parser.feed(decoder.decode());
     if (failure || !done) throw new Error(failure || 'لم يكتمل تحويل الصوت');
+    await (supabaseAdmin as any).from('video_caption_chunks').upsert({ video_id: videoId, audio_hash: audioHash, text });
     return { text };
   });

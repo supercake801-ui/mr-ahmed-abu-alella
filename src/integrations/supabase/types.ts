@@ -200,6 +200,32 @@ export type Database = {
         }
         Relationships: []
       }
+      video_caption_chunks: {
+        Row: {
+          audio_hash: string
+          text: string
+          video_id: string
+        }
+        Insert: {
+          audio_hash: string
+          text: string
+          video_id: string
+        }
+        Update: {
+          audio_hash?: string
+          text?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_caption_chunks_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_secrets: {
         Row: {
           password_hash: string
