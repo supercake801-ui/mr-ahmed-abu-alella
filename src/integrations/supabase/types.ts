@@ -182,6 +182,24 @@ export type Database = {
         }
         Relationships: []
       }
+      video_ai_state: {
+        Row: {
+          blocked: boolean
+          id: boolean
+          reason: string | null
+        }
+        Insert: {
+          blocked?: boolean
+          id?: boolean
+          reason?: string | null
+        }
+        Update: {
+          blocked?: boolean
+          id?: boolean
+          reason?: string | null
+        }
+        Relationships: []
+      }
       video_secrets: {
         Row: {
           password_hash: string
@@ -213,6 +231,8 @@ export type Database = {
       }
       videos: {
         Row: {
+          captions_kind: string | null
+          captions_vtt: string | null
           course_id: string
           created_at: string
           description: string
@@ -222,6 +242,7 @@ export type Database = {
           mime_type: string | null
           owner_id: string
           published_at: string | null
+          quality_paths: Json
           size_bytes: number | null
           status: Database["public"]["Enums"]["video_status"]
           thumbnail_path: string | null
@@ -231,6 +252,8 @@ export type Database = {
           video_path: string | null
         }
         Insert: {
+          captions_kind?: string | null
+          captions_vtt?: string | null
           course_id: string
           created_at?: string
           description?: string
@@ -240,6 +263,7 @@ export type Database = {
           mime_type?: string | null
           owner_id: string
           published_at?: string | null
+          quality_paths?: Json
           size_bytes?: number | null
           status?: Database["public"]["Enums"]["video_status"]
           thumbnail_path?: string | null
@@ -249,6 +273,8 @@ export type Database = {
           video_path?: string | null
         }
         Update: {
+          captions_kind?: string | null
+          captions_vtt?: string | null
           course_id?: string
           created_at?: string
           description?: string
@@ -258,6 +284,7 @@ export type Database = {
           mime_type?: string | null
           owner_id?: string
           published_at?: string | null
+          quality_paths?: Json
           size_bytes?: number | null
           status?: Database["public"]["Enums"]["video_status"]
           thumbnail_path?: string | null

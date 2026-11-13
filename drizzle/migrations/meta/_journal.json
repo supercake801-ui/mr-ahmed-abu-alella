@@ -15,6 +15,13 @@
       "when": 1794515219977,
       "tag": "0001_admin_exclusive_teacher_role",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794528069124,
+      "tag": "0002_video_quality_captions",
+      "breakpoints": true
     }
   ]
 }
