@@ -1,5 +1,7 @@
 # Requested platform development
 
+- [ ] Current focused request: improve Arabic/English caption context and audio extraction, persist caption sizes, activate failed/uploading studio cards, and recheck existing cloud quality playback. Physical iOS/Android and Windows/Mac browsers require separate device testing.
+
 - [x] Phase one: four caption sizes, genuine 480p/720p/1080p and Auto switching preserving playback, course/video thumbnail links and touch feedback. Chromium desktop/mobile/touch checked; 7 tests passed. Existing portrait video variants are resized encodes, not recovered detail; physical Android/iPhone unverified.
 
 - [ ] Current exclusive request: real quality sources and Auto selection, staff-generated cached captions and WebVTT, verified on actual video. Other platform tasks deferred outside this request.

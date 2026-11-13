@@ -82,7 +82,7 @@ export function VideosPanel() {
                   <Thumb v={v} />
                   <div className="space-y-2 p-4">
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-semibold leading-snug">{v.status === 'draft' || v.status === 'published' ? <Link to="/watch/$videoId" params={{videoId:v.id}} className="media-card-link after:absolute after:inset-0 after:content-['']">{v.title}</Link> : v.title}</h3>
+                      <h3 className="font-semibold leading-snug">{v.status === 'draft' || v.status === 'published' ? <Link to="/watch/$videoId" params={{videoId:v.id}} className="media-card-link after:absolute after:inset-0 after:content-['']">{v.title}</Link> : <Button variant="link" className="media-card-link h-auto whitespace-normal p-0 text-start after:absolute after:inset-0 after:content-['']" onClick={() => setDialog({ kind: 'upload', video: v })}>{v.title}</Button>}</h3>
                       <Badge variant={v.status === "published" ? "default" : v.status === "failed" ? "destructive" : "secondary"}>{STATUS_LABEL[v.status]}</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">{v.courses?.title ?? "—"} · {formatBytes(v.size_bytes)} {v.duration_seconds ? "· " + formatDuration(v.duration_seconds) : ""}</p>

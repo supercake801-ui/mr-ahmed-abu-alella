@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { createResumableUpload } from '@/lib/upload';
+import type { CaptionLanguage } from '@/lib/caption-settings';
 
 export function VideoMediaPanel({ videoId }: { videoId: string }) {
   const [height, setHeight] = useState('720');
@@ -16,6 +17,7 @@ export function VideoMediaPanel({ videoId }: { videoId: string }) {
   const [status, setStatus] = useState('');
   const [qualities, setQualities] = useState<Record<string, string>>({});
   const [hasCC, setHasCC] = useState(false);
+  const [language, setLanguage] = useState<CaptionLanguage>('auto');
   const abort = useRef<AbortController | null>(null);
   useEffect(() => {
     void supabase.from('videos').select('quality_paths,captions_vtt').eq('id', videoId).single().then(({ data }) => {
@@ -35,7 +37,7 @@ export function VideoMediaPanel({ videoId }: { videoId: string }) {
       const { data: v } = await supabase.from('videos').select('duration_seconds').eq('id', videoId).single();
       const r = await getPlaybackUrl({ data: { videoId } });
       if (!r.ok || !v?.duration_seconds) throw new Error('الفيديو أو مدة التشغيل غير متاحة');
-      const vtt = await generateCaptions(videoId, r.url, v.duration_seconds, setStatus, abort.current.signal);
+      const vtt = await generateCaptions(videoId, r.url, v.duration_seconds, setStatus, abort.current.signal, language);
       await saveCC(vtt, 'auto'); setStatus('اكتملت الترجمة التلقائية');
     } catch (e) { if (abort.current?.signal.aborted) setStatus('تم الإيقاف'); else { setStatus(String(e)); toast.error(String(e)); } }
     finally { setBusy(false); }
@@ -64,7 +66,9 @@ export function VideoMediaPanel({ videoId }: { videoId: string }) {
       <Label className="min-w-0 flex-1">ملف الجودة<Input aria-label="ملف الجودة" type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={e => { const f = e.target.files?.[0]; if (f) void upload(f); }} /></Label></div>
     <p className="text-sm text-muted-foreground">الجودات المتاحة: {Object.keys(qualities).map(h => `${h}p`).join('، ') || 'المصدر الأصلي'}</p>
     <Label>ملف WebVTT<Input type="file" accept=".vtt,text/vtt" aria-label="ملف WebVTT" disabled={busy} onChange={async e => { const f=e.target.files?.[0]; if (!f) return; try { await saveCC(await f.text(), 'manual'); } catch(error) { toast.error(String(error)); } }} /></Label>
-    <Button type="button" variant="outline" disabled={busy || hasCC} onClick={auto}>{hasCC ? 'الترجمة محفوظة' : 'توليد الترجمة تلقائيًا'}</Button>
+    <Label>لغة الكلام</Label>
+    <Select value={language} onValueChange={value => { if (value === 'auto' || value === 'ar' || value === 'en') setLanguage(value); }} disabled={busy}><SelectTrigger aria-label="لغة الكلام"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="auto">تلقائي — العربية والإنجليزية</SelectItem><SelectItem value="ar">العربية</SelectItem><SelectItem value="en">English</SelectItem></SelectContent></Select>
+    <Button type="button" variant="outline" disabled={busy} onClick={auto}>{hasCC ? 'إعادة توليد الترجمة' : 'توليد الترجمة تلقائيًا'}</Button>
     {busy && abort.current && <Button type="button" variant="ghost" onClick={() => abort.current?.abort()}>إيقاف التوليد</Button>}
     {status && <p role="status" className="text-sm break-words">{status}</p>}
   </section>;
