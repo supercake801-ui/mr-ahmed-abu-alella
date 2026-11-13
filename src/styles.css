@@ -56,6 +56,10 @@
 }
 
 :root {
+  --caption-small: 14px;
+  --caption-medium: 18px;
+  --caption-large: 24px;
+  --caption-extra-large: 30px;
   --radius: 0.85rem;
   /* Brand: navy #14243A, teal #168C8C, gold #D9AE57 */
   --navy: oklch(0.262 0.044 252);
@@ -128,6 +132,37 @@
     outline-offset: 2px;
   }
 }
+
+.video-captions {
+  position: absolute;
+  inset-inline: 4%;
+  bottom: 5%;
+  text-align: center;
+  pointer-events: none;
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  max-height: 65%;
+  overflow: hidden;
+  color: var(--navy-foreground);
+  font-family: var(--font-sans);
+}
+.video-captions span {
+  background: var(--navy);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 2px 6px;
+}
+.captions-small { font-size: var(--caption-small); }
+.captions-medium { font-size: var(--caption-medium); }
+.captions-large { font-size: var(--caption-large); }
+.captions-extra-large { font-size: var(--caption-extra-large); }
+
+.media-card-link { touch-action: manipulation; }
+@media (hover: hover) {
+  .media-card-link:hover { background-color: var(--accent); }
+}
+.media-card-link:active { background-color: var(--accent); }
 
 @utility font-display {
   font-family: var(--font-display);

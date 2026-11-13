@@ -52,18 +52,18 @@ function Dashboard() {
             const vids = q.data.videos.filter((v) => v.course_id === c.id);
             return (
               <section key={c.id} className="overflow-hidden rounded-xl border border-border bg-card">
-                <div className="flex items-center gap-4 border-b border-border p-4">
+                <Link to="/courses/$courseId" params={{ courseId: c.id }} className="media-card-link flex items-center gap-4 border-b border-border p-4 transition-colors">
                   <div className="h-16 w-28 shrink-0 overflow-hidden rounded-md"><CourseCover course={c} /></div>
                   <div className="flex-1">
-                    <Link to="/courses/$courseId" params={{ courseId: c.id }} className="font-display text-xl text-navy hover:underline">{c.title}</Link>
+                    <h2 className="font-display text-xl text-navy">{c.title}</h2>
                     <p className="text-sm text-muted-foreground">{vids.length} فيديو</p>
                   </div>
-                </div>
+                </Link>
                 {vids.length ? (
                   <ul className="divide-y divide-border">
                     {vids.map((v) => (
                       <li key={v.id}>
-                        <Link to="/watch/$videoId" params={{ videoId: v.id }} className="flex items-center gap-3 p-3 hover:bg-accent">
+                        <Link to="/watch/$videoId" params={{ videoId: v.id }} className="media-card-link flex items-center gap-3 p-3 transition-colors">
                           <PlayCircle className="h-5 w-5 text-teal" />
                           <span className="flex-1">{v.title}</span>
                           {v.has_password && <span className="flex items-center gap-1 text-xs text-gold"><KeyRound className="h-3 w-3" /> بكلمة مرور</span>}

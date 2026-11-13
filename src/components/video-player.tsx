@@ -22,6 +22,8 @@ export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, o
   const [quality, setQuality] = useState("Auto");
   const [activeSrc, setActiveSrc] = useState(src);
   const [captionUrl, setCaptionUrl] = useState<string>();
+  const [captionSize, setCaptionSize] = useState('medium');
+  const [captionText, setCaptionText] = useState('');
   useEffect(() => {
     if (!captionsVtt) { setCaptionUrl(undefined); return; }
     const url = URL.createObjectURL(new Blob([captionsVtt], { type: 'text/vtt' }));
@@ -56,6 +58,17 @@ export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, o
   const box = useRef<HTMLDivElement>(null);
   const [full, setFull] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const sourceKey = sources.map(s => `${s.label}:${s.url}`).join('|');
+  useEffect(() => {
+    if (quality !== 'Auto' || !box.current) return;
+    const observer = new ResizeObserver(() => changeQuality('Auto'));
+    observer.observe(box.current);
+    return () => observer.disconnect();
+  }, [quality, src, sourceKey]);
+  function updateCaption(video: HTMLVideoElement) {
+    const cues = Array.from(video.textTracks[0]?.cues ?? []);
+    setCaptionText(cues.filter(c => c.startTime <= video.currentTime && c.endTime > video.currentTime).map(c => (c as VTTCue).text).join('\n'));
+  }
   useEffect(() => {
     const on = () => setFull(document.fullscreenElement === box.current);
     document.addEventListener("fullscreenchange", on);
@@ -85,7 +98,7 @@ export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, o
   useEffect(() => {
     const tracks = ref.current?.textTracks;
     if (!tracks) return;
-    for (const t of Array.from(tracks)) t.mode = cc ? "showing" : "hidden";
+    for (const t of Array.from(tracks)) t.mode = 'hidden';
   }, [cc, captionUrl, activeSrc]);
 
   function tap(e: React.PointerEvent<HTMLDivElement>) {
@@ -111,22 +124,23 @@ export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, o
       <video
         ref={ref} src={activeSrc} disablePictureInPicture playsInline
         onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
-        onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+        onTimeUpdate={(e) => { setTime(e.currentTarget.currentTime); updateCaption(e.currentTarget); }}
         onDurationChange={(e) => setDuration(Number.isFinite(e.currentTarget.duration) ? e.currentTarget.duration : 0)}
         onVolumeChange={(e) => { setMuted(e.currentTarget.muted); setVolume(e.currentTarget.volume); }}
         className={full || expanded ? "h-full w-full object-contain bg-navy" : "block aspect-video w-full bg-navy"}
         onLoadedMetadata={(e) => {
           e.currentTarget.playbackRate = speed;
-          setHasTracks(e.currentTarget.textTracks.length > 0);
+          setHasTracks(!!captionUrl);
           if (resumeAt.current) e.currentTarget.currentTime = resumeAt.current;
           if (resumePlaying.current) { resumePlaying.current = false; void e.currentTarget.play().catch(() => setPlaying(false)); }
         }}
         onError={() => { resumeAt.current = ref.current?.currentTime ?? 0; onError?.(resumeAt.current); }}
         onContextMenu={(e) => e.preventDefault()}
       >
-        {captionUrl && <track key={captionUrl} kind="captions" src={captionUrl} srcLang="ar" label="العربية" onLoad={() => { setHasTracks(true); const tracks = ref.current?.textTracks; if (tracks) for (const t of Array.from(tracks)) t.mode = cc ? 'showing' : 'hidden'; }} />}
+        {captionUrl && <track key={captionUrl} kind="captions" src={captionUrl} srcLang="ar" label="العربية" default onLoad={() => { setHasTracks(true); const video = ref.current; if (video) { for (const t of Array.from(video.textTracks)) t.mode = 'hidden'; updateCaption(video); } }} />}
       </video>
       <div className="absolute inset-0 select-none" onPointerUp={tap} aria-hidden />
+      {cc && captionText && <div className={`video-captions captions-${captionSize}`} dir="auto" data-testid="video-captions"><span>{captionText}</span></div>}
       {flash && (
         <div className={`pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full bg-navy/70 px-4 py-2 text-lg font-bold text-navy-foreground ${flash === "right" ? "right-[18%]" : "left-[18%]"}`}>
           {flash === "right" ? "+10 ث" : "−10 ث"}
@@ -156,7 +170,7 @@ export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, o
             <MoreVertical className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56" container={box.current ?? undefined}>
+        <DropdownMenuContent align="end" className="max-h-[min(70vh,32rem)] w-56 overflow-y-auto" container={box.current ?? undefined}>
           <DropdownMenuLabel className="flex items-center gap-2"><Gauge className="h-4 w-4" />السُّرْعَة</DropdownMenuLabel>
           <div className="grid grid-cols-3 gap-1 px-1 pb-1">
             {SPEEDS.map((s) => (
@@ -166,10 +180,13 @@ export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, o
           <DropdownMenuSeparator />
           <DropdownMenuLabel className="flex items-center gap-2"><Settings2 className="h-4 w-4" />الجَوْدَة</DropdownMenuLabel>
           {['Auto', 'المصدر الأصلي', ...sources.map(s => s.label)].map(label => <DropdownMenuItem key={label} onSelect={() => changeQuality(label)}>{quality === label && <Check className="h-4 w-4" />}{label === 'Auto' ? 'تلقائي (Auto)' : label}</DropdownMenuItem>)}
+          {['1080p', '720p', '480p'].filter(label => !sources.some(s => s.label === label)).map(label => <DropdownMenuItem key={label} disabled>{label} — غير متاحة</DropdownMenuItem>)}
           <DropdownMenuSeparator />
           <DropdownMenuItem disabled={!hasTracks} onSelect={() => setCc((c) => !c)}>
             <Captions className="h-4 w-4" />CC: {hasTracks ? (cc ? "تشغيل" : "إيقاف") : "لا توجد ترجمة لهذا الفيديو"}
           </DropdownMenuItem>
+          <DropdownMenuLabel className="flex items-center gap-2"><Captions className="h-4 w-4" />حجم الترجمة</DropdownMenuLabel>
+          {([{value:'small',label:'صغير'},{value:'medium',label:'متوسط'},{value:'large',label:'كبير'},{value:'extra-large',label:'كبير جدًا'}]).map(option => <DropdownMenuItem key={option.value} onSelect={() => setCaptionSize(option.value)}>{captionSize === option.value && <Check className="h-4 w-4" />}{option.label}</DropdownMenuItem>)}
         </DropdownMenuContent>
       </DropdownMenu>
         </div>

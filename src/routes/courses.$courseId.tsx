@@ -79,7 +79,7 @@ function CoursePage() {
         <ol className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
           {videos.data.map((v, i) => (
             <li key={v.id}>
-              <Link to="/watch/$videoId" params={{ videoId: v.id }} className="flex items-center gap-4 p-4 transition-colors hover:bg-accent">
+              <Link to="/watch/$videoId" params={{ videoId: v.id }} className="media-card-link flex items-center gap-4 p-4 transition-colors">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy text-sm text-navy-foreground">{i + 1}</span>
                 <span className="flex-1">
                   <span className="block font-medium">{v.title}</span>

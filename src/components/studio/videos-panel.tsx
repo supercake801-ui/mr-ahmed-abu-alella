@@ -78,16 +78,16 @@ export function VideosPanel() {
           <>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {q.data.rows.map((v) => (
-                <div key={v.id} className="overflow-hidden rounded-xl border bg-card">
+                <div key={v.id} className="group relative overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-[var(--shadow-lift)]">
                   <Thumb v={v} />
                   <div className="space-y-2 p-4">
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-semibold leading-snug">{v.title}</h3>
+                      <h3 className="font-semibold leading-snug">{v.status === 'draft' || v.status === 'published' ? <Link to="/watch/$videoId" params={{videoId:v.id}} className="media-card-link after:absolute after:inset-0 after:content-['']">{v.title}</Link> : v.title}</h3>
                       <Badge variant={v.status === "published" ? "default" : v.status === "failed" ? "destructive" : "secondary"}>{STATUS_LABEL[v.status]}</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">{v.courses?.title ?? "—"} · {formatBytes(v.size_bytes)} {v.duration_seconds ? "· " + formatDuration(v.duration_seconds) : ""}</p>
                     {v.has_password && <p className="flex items-center gap-1 text-xs text-gold"><KeyRound className="h-3 w-3" />محمي بكلمة مرور</p>}
-                    <div className="flex flex-wrap gap-2 pt-1">
+                    <div className="relative z-10 flex w-fit flex-wrap gap-2 pt-1">
                       {(v.status === "uploading" || v.status === "failed") && (
                         <Button size="sm" variant="outline" onClick={() => setDialog({ kind: "upload", video: v })}><RotateCcw className="ml-1 h-4 w-4" />إعادة الرفع</Button>
                       )}
