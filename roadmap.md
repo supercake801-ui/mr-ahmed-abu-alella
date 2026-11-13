@@ -1,6 +1,6 @@
 # Requested platform development
 
-- [ ] Phase one: caption-size menu, genuine quality selection/Auto, full-area course/video thumbnail links and touch feedback; desktop/mobile verification.
+- [x] Phase one: four caption sizes, genuine 480p/720p/1080p and Auto switching preserving playback, course/video thumbnail links and touch feedback. Chromium desktop/mobile/touch checked; 7 tests passed. Existing portrait video variants are resized encodes, not recovered detail; physical Android/iPhone unverified.
 
 - [ ] Current exclusive request: real quality sources and Auto selection, staff-generated cached captions and WebVTT, verified on actual video. Other platform tasks deferred outside this request.
 

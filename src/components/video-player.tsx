@@ -33,6 +33,7 @@ export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, o
     const all = [{ label: 'المصدر الأصلي', url: src }, ...sources];
     const chosen = label === 'Auto' ? autoQuality(all, box.current?.clientWidth ?? 1280, (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) : all.find(s => s.label === label);
     if (!chosen) return;
+    if (chosen.url === ref.current?.getAttribute('src')) { setQuality(label); return; }
     resumeAt.current = ref.current?.currentTime ?? 0;
     resumePlaying.current = !!ref.current && !ref.current.paused;
     setQuality(label); setActiveSrc(chosen.url);
