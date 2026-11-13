@@ -16,3 +16,4 @@
 - Use a single custom video control bar instead of native controls so sound and playback tools retain stable positions in container fullscreen.
 - Store real quality file paths and cached WebVTT per video; sign them only after the existing playback access/password check, so alternate media cannot bypass lesson protection.
 - Generate captions once through staff-authorized sequential audio-window transcription; use source-window timing (approximate, not word alignment) and browser-only FFmpeg because the published server cannot run native media binaries.
+- Extract mono audio once per caption job, transcribe sequential windows with language/spelling context through the Gateway SDK, and key cached chunks by audio plus request settings to avoid stale results and repeated billing.

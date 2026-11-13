@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Captions, Check, Gauge, Maximize, Minimize, MoreVertical, Settings2, Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { autoQuality, type QualitySource } from "@/lib/video-media";
+import { captionSizeOrDefault, type CaptionSize } from '@/lib/caption-settings';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -22,7 +23,13 @@ export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, o
   const [quality, setQuality] = useState("Auto");
   const [activeSrc, setActiveSrc] = useState(src);
   const [captionUrl, setCaptionUrl] = useState<string>();
-  const [captionSize, setCaptionSize] = useState('medium');
+  const [captionSize, setCaptionSize] = useState<CaptionSize>('medium');
+  useEffect(() => { try { setCaptionSize(captionSizeOrDefault(localStorage.getItem('video-caption-size'))); } catch { /* Storage may be disabled. */ } }, []);
+  function changeCaptionSize(value: string) {
+    const size = captionSizeOrDefault(value);
+    setCaptionSize(size);
+    try { localStorage.setItem('video-caption-size', size); } catch { /* Keep the current session preference. */ }
+  }
   const [captionText, setCaptionText] = useState('');
   useEffect(() => {
     if (!captionsVtt) { setCaptionUrl(undefined); return; }
@@ -138,7 +145,7 @@ export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, o
         onError={() => { resumeAt.current = ref.current?.currentTime ?? 0; onError?.(resumeAt.current); }}
         onContextMenu={(e) => e.preventDefault()}
       >
-        {captionUrl && <track key={captionUrl} kind="captions" src={captionUrl} srcLang="ar" label="العربية" default onLoad={() => { setHasTracks(true); const video = ref.current; if (video) { for (const t of Array.from(video.textTracks)) t.mode = 'hidden'; updateCaption(video); } }} />}
+        {captionUrl && <track key={captionUrl} kind="captions" src={captionUrl} label="العربية / English" default onLoad={() => { setHasTracks(true); const video = ref.current; if (video) { for (const t of Array.from(video.textTracks)) t.mode = 'hidden'; updateCaption(video); } }} />}
       </video>
       <div className="absolute inset-0 select-none" onPointerUp={tap} aria-hidden />
       {cc && captionText && <div className={`video-captions captions-${captionSize}`} dir="auto" data-testid="video-captions"><span>{captionText}</span></div>}
@@ -187,7 +194,7 @@ export function VideoPlayer({ src, sources = [], captionsVtt, initialTime = 0, o
             <Captions className="h-4 w-4" />CC: {hasTracks ? (cc ? "تشغيل" : "إيقاف") : "لا توجد ترجمة لهذا الفيديو"}
           </DropdownMenuItem>
           <DropdownMenuLabel className="flex items-center gap-2"><Captions className="h-4 w-4" />حجم الترجمة</DropdownMenuLabel>
-          {([{value:'small',label:'صغير'},{value:'medium',label:'متوسط'},{value:'large',label:'كبير'},{value:'extra-large',label:'كبير جدًا'}]).map(option => <DropdownMenuItem key={option.value} onSelect={() => setCaptionSize(option.value)}>{captionSize === option.value && <Check className="h-4 w-4" />}{option.label}</DropdownMenuItem>)}
+          {([{value:'small',label:'صغير'},{value:'medium',label:'متوسط'},{value:'large',label:'كبير'},{value:'extra-large',label:'كبير جدًا'}]).map(option => <DropdownMenuItem key={option.value} onSelect={() => changeCaptionSize(option.value)}>{captionSize === option.value && <Check className="h-4 w-4" />}{option.label}</DropdownMenuItem>)}
         </DropdownMenuContent>
       </DropdownMenu>
         </div>
