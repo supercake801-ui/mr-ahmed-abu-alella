@@ -1,5 +1,7 @@
 # Requested platform development
 
+- [ ] Current exclusive request: real quality sources and Auto selection, staff-generated cached captions and WebVTT, verified on actual video. Other platform tasks deferred outside this request.
+
 - [ ] Latest final brief: full-card links/touch states, persistent fullscreen toolbar, real quality sources and WebVTT, searchable student management, interactive courses, announcements and independent themes.
 - [x] Current repair: historical image in a separate right-hand frame, welcome text left; shared play/sound/CC/fullscreen/settings toolbar. Chromium checked at 1280px and 390px: actual lesson playback, mute/unmute, fullscreen settings and 3× speed. CC remains unavailable without caption tracks; other browsers/devices unverified.
 - [ ] Secure primary owner and temporary teacher assignment; protect owner and preserve all existing accounts.
